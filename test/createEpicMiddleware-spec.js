@@ -2,10 +2,12 @@
 import 'babel-polyfill';
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, __DO_NOT_USE__ActionTypes as actionTypes } from 'redux';
 import { createEpicMiddleware, combineEpics, ActionsObservable, StateObservable, EPIC_END, ofType } from '../';
 import { of, empty, merge } from 'rxjs';
 import { mapTo, map, ignoreElements, distinctUntilChanged } from 'rxjs/operators';
+
+const INIT = actionTypes.INIT;
 
 describe('createEpicMiddleware', () => {
   it('should provide epics a stream of action$ and a stream of state$', (done) => {
@@ -88,7 +90,7 @@ describe('createEpicMiddleware', () => {
 
     expect(store.getState()).to.equal(2);
     expect(actions).to.deep.equal([{
-      type: '@@redux/INIT'
+      type: INIT
     }, {
       type: 'PING'
     }, {
@@ -128,7 +130,7 @@ describe('createEpicMiddleware', () => {
     expect(console.warn.callCount).to.equal(1);
     expect(console.warn.getCall(0).args[0]).to.equal('redux-observable | WARNING: You accessed state$.value inside one of your Epics, before your reducers have run for the first time, so there is no state yet. You\'ll need to wait until after the first action (@@redux/INIT) is dispatched or by using state$ as an Observable.');
     expect(store.getState()).to.deep.equal([{
-      type: '@@redux/INIT'
+      type: INIT
     }, {
       type: 'PONG',
       state: undefined
@@ -186,7 +188,7 @@ describe('createEpicMiddleware', () => {
     store.dispatch({ type: 'FIRE_2' });
 
     expect(store.getState()).to.deep.equal([
-      { type: '@@redux/INIT' },
+      { type: INIT },
       { type: 'FIRE_1' },
       { type: 'ACTION_1' },
       { type: 'FIRE_2' },
@@ -305,7 +307,7 @@ describe('createEpicMiddleware', () => {
     store.dispatch({ type: 'FIRE_GENERIC' });
 
     expect(store.getState()).to.deep.equal([
-      { type: '@@redux/INIT' },
+      { type: INIT },
       { type: 'EPIC_1' },
       { type: 'FIRE_1' },
       { type: 'ACTION_1' },
@@ -340,7 +342,7 @@ describe('createEpicMiddleware', () => {
     const store = createStore(reducer, applyMiddleware(middleware));
 
     expect(store.getState()).to.deep.equal([
-      { type: '@@redux/INIT' },
+      { type: INIT },
       { type: 3 }
     ]);
   });
